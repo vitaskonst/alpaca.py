@@ -176,39 +176,29 @@ $(info I CC:       $(CCV))
 $(info I CXX:      $(CXXV))
 $(info )
 
-default: chat quantize
+default: build/alpaca
 
 #
 # Build library
 #
 
-ggml.o: ggml.c ggml.h
-	$(CC)  $(CFLAGS)   -c ggml.c -o ggml.o
-
-utils.o: utils.cpp utils.h
-	$(CXX) $(CXXFLAGS) -c utils.cpp -o utils.o
-
 clean:
-	rm -f *.o main quantize
+	rm -r build/*
 
-chat: chat.cpp ggml.o utils.o
-	$(CXX) $(CXXFLAGS) chat.cpp ggml.o utils.o -o chat $(LDFLAGS)
+build/ggml.o: ggml.c ggml.h
+	$(CC)  $(CFLAGS) -c ggml.c -o build/ggml.o
 
-chat_mac: chat.cpp ggml.c utils.cpp
-	$(CC)  $(CFLAGS)   -c ggml.c -o ggml_x86.o -target x86_64-apple-macos
-	$(CC)  $(CFLAGS)   -c ggml.c -o ggml_arm.o -target arm64-apple-macos
-	
-	$(CXX) $(CXXFLAGS) chat.cpp ggml_x86.o utils.cpp -o chat_x86 $(LDFLAGS) -target x86_64-apple-macos
-	$(CXX) $(CXXFLAGS) chat.cpp ggml_arm.o utils.cpp -o chat_arm $(LDFLAGS) -target arm64-apple-macos
-	lipo -create -output chat_mac chat_x86 chat_arm
+build/utils.o: utils.cpp utils.h
+	$(CXX) $(CXXFLAGS) -c utils.cpp -o build/utils.o
 
-quantize: quantize.cpp ggml.o utils.o
-	$(CXX) $(CXXFLAGS) quantize.cpp ggml.o utils.o -o quantize $(LDFLAGS)
+build/alpaca: build/alpaca.o build/ggml.o build/utils.o build/json.o build/llama.o
+	$(CXX) $(CXXFLAGS) build/alpaca.o build/ggml.o build/utils.o build/json.o build/llama.o -o build/alpaca $(LDFLAGS)
 
-#
-# Tests
-#
+build/alpaca.o: alpaca.cpp
+	$(CXX) $(CXXFLAGS) -c alpaca.cpp -o build/alpaca.o
 
-.PHONY: tests
-tests:
-	bash ./tests/run-tests.sh
+build/llama.o: llama.h llama.cpp
+	$(CXX) $(CXXFLAGS) -c llama.cpp -o build/llama.o
+
+build/json.o: json.h json.cpp
+	$(CXX) $(CXXFLAGS) -c json.cpp -o build/json.o
