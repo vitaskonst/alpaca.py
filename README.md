@@ -2,29 +2,42 @@
 
 A python client based on [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp).
 
+The most important change W.R.T the original code is that context is not maintained between calls. That is there is not state so by default it doesn't behave like a chat bot. That said it's easy to add that simply by keeping track of all user and system utterances.
+
 ## Build
+
+Build cpp binary:
 
 ```shell
 cd cpp
+mkdir -p build
 make
 cd ..
 ```
 
+Set up python environment:
+
 ```shell
 conda create -n alpaca python=3.8
 pip install -r requirements.txt 
+conda activate alpaca
 ```
+
+## Try it out
+
+Command line:
 
 ```shell
 python demo_cli.py --alpaca-cli-path cpp/build/alpaca --model-path $MODEL_DIR/ggml-alpaca-7b-q4.bin 
 ```
+
+Web Demo (Streamlit):
 
 ```shell
 export ALPACA_CLI_PATH="$PWD/cpp/build/alpaca"
 export ALPACA_MODEL_PATH="$MODEL_DIR/ggml-alpaca-7b-q4.bin"
 python demo_cli.py --alpaca-cli-path cpp/build/alpaca --model-path $MODEL_DIR/ggml-alpaca-7b-q4.bin 
 ```
-
 
 ```python
 from alpaca import Alpaca
