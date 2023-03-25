@@ -2,7 +2,7 @@
 
 A python client based on [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp).
 
-The most important change W.R.T the original code is that context is not maintained between calls. That is there is not state so by default it doesn't behave like a chat bot. That said it's easy to add that simply by keeping track of all user and system utterances.
+The most important change W.R.T the original code is that context is not maintained between calls. That is there is no state, so by default it doesn't behave like a chat bot. That said, it's easy to add that simply by keeping track of all user and system utterances.
 
 ## Build
 
