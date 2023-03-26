@@ -4,7 +4,7 @@ from textwrap import wrap as _wrap
 
 import streamlit as st
 
-from alpaca import Alpaca
+from alpaca import Alpaca, InferenceRequest
 
 
 def wrap(text: str, width: int = 80) -> str:
@@ -31,7 +31,7 @@ input_text = st.text_input("input_text", "Are alpacas afraid of snakes?")
 
 t_start = datetime.now()
 with st.spinner("Running model..."):
-    output = alpaca.run_simple(input_text)
+    output = alpaca.run_simple(InferenceRequest(input_text=input_text))
 t_end = datetime.now()
 duration = t_end - t_start
 

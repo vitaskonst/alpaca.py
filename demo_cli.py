@@ -2,7 +2,7 @@ from pathlib import Path
 
 import typer
 
-from alpaca import Alpaca
+from alpaca import Alpaca, InferenceRequest
 
 app = typer.Typer()
 
@@ -17,7 +17,7 @@ def main(alpaca_cli_path: Path = typer.Option(...), model_path: Path = typer.Opt
                 return
             if not _input:
                 continue
-            output = alpaca.run_simple(_input)
+            output = alpaca.run_simple(InferenceRequest(input_text=_input))
             print(output["output"])
     except KeyboardInterrupt:
         pass
