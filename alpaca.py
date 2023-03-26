@@ -1,6 +1,5 @@
 import json
 import subprocess
-import time
 from pathlib import Path
 from threading import Lock
 from typing import Optional
@@ -11,6 +10,7 @@ class Alpaca:
         self.alpaca_cli = alpaca_cli
         self.model_path = model_path
         self.process: Optional[subprocess.Popen] = None
+        self.system_info: Optional[dict] = None
         self.lock = Lock()
         self.start()
 
@@ -25,16 +25,15 @@ class Alpaca:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
             )
-            time.sleep(5)
+            info_str = self._read_stdout()
+            info = json.loads(info_str)
+            self.system_info = {k: int(v) for k, v in info.items()}
 
     def _write(self, message: str) -> None:
         self.process.stdin.write(f"{message.strip()}\n")
         self.process.stdin.flush()
 
     def _read_stdout(self) -> str:
-        return self.process.stdout.readline().strip()
-
-    def _read_stderr(self) -> str:
         return self.process.stdout.readline().strip()
 
     def stop(self):
@@ -69,6 +68,7 @@ class Alpaca:
         output = json.loads(response)
         if "error" in output:
             raise Exception(output["error"])
+        output = {k: v if k == "output" else int(v) for k, v in output.items()}
         return output
 
     def run_simple(self, text: str) -> dict:

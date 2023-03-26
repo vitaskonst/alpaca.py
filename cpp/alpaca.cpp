@@ -33,10 +33,11 @@ ReadState read_input(const gpt_vocab &vocab, std::vector<gpt_vocab::id> &input,
     return READ_STATE_ERROR;
   }
 
-  for (auto quit_cmd : {"exit();", "quit();"}) {
+  for (auto quit_cmd : {"q", "exit", "quit", "exit;",
+                        "quit;"
+                        "exit();",
+                        "quit();"}) {
     if (strcmp(buffer, quit_cmd) == 0) {
-      if (params.verbose)
-        fprintf(stderr, "returning stop\n");
       return READ_STATE_STOP;
     }
   }
@@ -91,7 +92,7 @@ int main(int argc, char **argv) {
 
   gpt_params global_params;
 
-  if (gpt_params_parse(argc, argv, global_params) == false) {
+  if (!gpt_params_parse(argc, argv, global_params)) {
     return 1;
   }
 
@@ -108,19 +109,23 @@ int main(int argc, char **argv) {
     }
   }
 
-  // print system information
-  if (global_params.verbose) {
-    fprintf(stderr, "system_info: n_threads = %d / %d | %s\n",
-            global_params.n_threads, std::thread::hardware_concurrency(),
-            llama_print_system_info());
-  }
-
   // Determine the required inference memory per token:
   size_t mem_per_token = 0;
   {
     std::vector<float> logits;
     llama_eval(model, global_params.n_threads, 0, {0, 1, 2, 3}, logits,
                mem_per_token);
+  }
+
+  {
+    std::map<std::string, std::string> info = llama_system_info();
+    info["hardware_concurrency"] =
+        std::to_string(std::thread::hardware_concurrency());
+    info["mem_per_token"] = std::to_string(mem_per_token);
+    std::string output;
+    write_json_str_dict(info, output);
+    fprintf(stdout, "%s\n", output.c_str());
+    fflush(stdout);
   }
 
   while (true) {
@@ -137,8 +142,7 @@ int main(int argc, char **argv) {
       break;
     }
     if (state == READ_STATE_ERROR) {
-      if (params.verbose)
-        write_error("Invalid arguments");
+      write_error("Invalid arguments");
       continue;
     }
 
@@ -216,18 +220,12 @@ int main(int argc, char **argv) {
     std::map<std::string, std::string> output_map;
     output_map["output"] = output_text;
     output_map["reached_max_content_size"] =
-        ((n_past == model.hparams.n_ctx) ? "true" : "false");
-    {
-      char buffer[256];
-      sprintf(buffer, "%8zu", mem_per_token);
-      output_map["memory_per_token_bytes"] = buffer;
-      sprintf(buffer, "%lu", t_predict_us);
-      output_map["total_predict_time_us"] = buffer;
-      sprintf(buffer, "%lu", n_past);
-      output_map["total_token_length"] = buffer;
-      sprintf(buffer, "%lu", n_tokens_truncated);
-      output_map["n_tokens_truncated"] = buffer;
-    }
+        std::to_string((int)(n_past == model.hparams.n_ctx));
+    output_map["total_predict_time_us"] = std::to_string(t_predict_us);
+    output_map["total_token_length"] = std::to_string(n_past);
+    output_map["input_token_length"] = std::to_string(n_past - n_outputs);
+    output_map["output_token_length"] = std::to_string(n_outputs);
+    output_map["n_tokens_truncated"] = std::to_string(n_tokens_truncated);
 
     if (params.verbose)
       fprintf(stderr, "Writing outputs ...\n");

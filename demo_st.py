@@ -38,6 +38,7 @@ duration = t_end - t_start
 st.text(wrap(output.pop("output")))
 
 with st.expander("details"):
+    output.update(alpaca.system_info)
     st.write(output)
 
 st.write(f"Execution took: {duration.total_seconds()} seconds.")

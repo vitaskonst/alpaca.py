@@ -93,4 +93,4 @@ bool llama_eval_t(const llama_model &model, const int n_threads,
                   std::vector<float> &embd_w, size_t &mem_per_token,
                   int64_t &duration_us);
 
-const char *llama_print_system_info(void);
+std::map<std::string, std::string> llama_system_info(void);

@@ -722,22 +722,21 @@ bool llama_eval_t(const llama_model &model, const int n_threads,
   return success;
 }
 
-const char *llama_print_system_info(void) {
-  static std::string s;
+std::map<std::string, std::string> llama_system_info(void) {
+  std::map<std::string, std::string> info;
 
-  s = "";
-  s += "AVX = " + std::to_string(ggml_cpu_has_avx()) + " | ";
-  s += "AVX2 = " + std::to_string(ggml_cpu_has_avx2()) + " | ";
-  s += "AVX512 = " + std::to_string(ggml_cpu_has_avx512()) + " | ";
-  s += "FMA = " + std::to_string(ggml_cpu_has_fma()) + " | ";
-  s += "NEON = " + std::to_string(ggml_cpu_has_neon()) + " | ";
-  s += "ARM_FMA = " + std::to_string(ggml_cpu_has_arm_fma()) + " | ";
-  s += "F16C = " + std::to_string(ggml_cpu_has_f16c()) + " | ";
-  s += "FP16_VA = " + std::to_string(ggml_cpu_has_fp16_va()) + " | ";
-  s += "WASM_SIMD = " + std::to_string(ggml_cpu_has_wasm_simd()) + " | ";
-  s += "BLAS = " + std::to_string(ggml_cpu_has_blas()) + " | ";
-  s += "SSE3 = " + std::to_string(ggml_cpu_has_sse3()) + " | ";
-  s += "VSX = " + std::to_string(ggml_cpu_has_vsx()) + " | ";
+  info["AVX"] = std::to_string(ggml_cpu_has_avx());
+  info["AVX2"] = std::to_string(ggml_cpu_has_avx2());
+  info["AVX512"] = std::to_string(ggml_cpu_has_avx512());
+  info["FMA"] = std::to_string(ggml_cpu_has_fma());
+  info["NEON"] = std::to_string(ggml_cpu_has_neon());
+  info["ARM_FMA"] = std::to_string(ggml_cpu_has_arm_fma());
+  info["F16C"] = std::to_string(ggml_cpu_has_f16c());
+  info["FP16_VA"] = std::to_string(ggml_cpu_has_fp16_va());
+  info["WASM_SIMD"] = std::to_string(ggml_cpu_has_wasm_simd());
+  info["BLAS"] = std::to_string(ggml_cpu_has_blas());
+  info["SSE3"] = std::to_string(ggml_cpu_has_sse3());
+  info["VSX"] = std::to_string(ggml_cpu_has_vsx());
 
-  return s.c_str();
+  return info;
 }
