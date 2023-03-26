@@ -40,7 +40,7 @@ def run(
     ).wrap_with_default_prompt(),
 ) -> dict:
     """Runs the text through the model as is."""
-    return get_model().run_simple(input)
+    return get_model().run(input)
 
 
 @app.post("/run_simple")
@@ -48,4 +48,4 @@ def run_simple(
     input: InferenceRequest = InferenceRequest(input_text="Are alpacas afraid of snakes?"),
 ) -> dict:
     """Wraps the text with a standard prompt before passing it to the model."""
-    return get_model().run(**input.dict())
+    return get_model().run_simple(input)

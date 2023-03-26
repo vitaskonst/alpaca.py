@@ -32,22 +32,20 @@ conda activate alpaca
 python demo_cli.py --alpaca-cli-path cpp/build/alpaca --model-path $MODEL_DIR/ggml-alpaca-7b-q4.bin 
 ```
 
-### Web Demo (Streamlit):
-
-(This requires installing streamlit (see above).)
-
-```shell
-export ALPACA_CLI_PATH="$PWD/cpp/build/alpaca"
-export ALPACA_MODEL_PATH="$MODEL_DIR/ggml-alpaca-7b-q4.bin"
-streamlit run demo_st.py 
-```
-
 ### JSON REST Api (FastApi)
 
 Navigate to http://127.0.0.1:8080/docs for the docs after starting it.
 
 ```shell
+export ALPACA_CLI_PATH="$PWD/cpp/build/alpaca"
+export ALPACA_MODEL_PATH="$MODEL_DIR/ggml-alpaca-7b-q4.bin"
 uvicorn alpaca_api:app --port 8080
+```
+
+You can call also call the API using the streamlit demo (This requires installing streamlit (see above).)
+
+```shell
+streamlit run demo_st.py 
 ```
 
 ### Python Module:
