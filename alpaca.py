@@ -10,7 +10,7 @@ import pydantic
 def wrap_with_default_prompt(text: str) -> str:
     return (
         "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n"
-        f"### Instruction:\n\n{text}### Response:\n\n"
+        f"### Instruction: Write an ad text based one the given keywords:\n\n{text}### Response:\n\n"
     )
 
 
