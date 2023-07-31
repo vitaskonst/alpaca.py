@@ -1,5 +1,6 @@
 cpp/build
-
 .vscode
-
 __pycache__
+.env
+keys.txt
+venv/
