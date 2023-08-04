@@ -76,7 +76,7 @@ def verify_token(token: str) -> bool:
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    secured_urls = {'/advertisement'}
+    secured_urls = {'/advertisement', '/custom-prompt'}
     
     if request.url.path in secured_urls:
         try:
@@ -100,10 +100,29 @@ async def add_process_time_header(request: Request, call_next):
 
     return await call_next(request)
 
-@app.get("/stats")
+@app.get("/stats", include_in_schema=False)
 def stats() -> Dict[str, UserStats]:
     return get_keys()
 
+
+@app.post("/advertisement-mock")
+def run(input: InferenceRequest) -> Dict:
+    return {
+        "input_token_length": 55,
+        "n_tokens_truncated": 0,
+        "output": "Experience the thrill of watching TV like never before with our 4K OLED TV. Get a crystal clear picture and an incredibly thin design, perfect for any home decor!",
+        "output_token_length": 41,
+        "reached_max_content_size": 0,
+        "total_predict_time_us": 24023165,
+        "total_token_length": 96
+    }
+
+
 @app.post("/advertisement")
+def run(input: InferenceRequest) -> Dict:
+    return get_model().run(input.wrap_with_advertisement_prompt())
+
+
+@app.post("/custom-prompt")
 def run(input: InferenceRequest) -> Dict:
     return get_model().run(input.wrap_with_default_prompt())

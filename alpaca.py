@@ -10,8 +10,12 @@ import pydantic
 def wrap_with_default_prompt(text: str) -> str:
     return (
         "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n"
-        f"### Instruction: Write an ad text based one the given keywords:\n\n{text}### Response:\n\n"
+        f"### Instruction:\n\n{text}### Response:\n\n"
     )
+
+
+def wrap_with_advertisement_prompt(text: str) -> str:
+    return wrap_with_default_prompt(f'Write an ad text based one the given keywords: {text}')
 
 
 class InferenceRequest(pydantic.BaseModel):
@@ -26,6 +30,11 @@ class InferenceRequest(pydantic.BaseModel):
     def wrap_with_default_prompt(self) -> "InferenceRequest":
         copy = self.copy()
         copy.input_text = wrap_with_default_prompt(copy.input_text)
+        return copy
+
+    def wrap_with_advertisement_prompt(self) -> "InferenceRequest":
+        copy = self.copy()
+        copy.input_text = wrap_with_advertisement_prompt(copy.input_text)
         return copy
 
 
